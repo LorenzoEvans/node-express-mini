@@ -1,140 +1,63 @@
-// implement your API here
-const express = require("express");
-
-const db = require('./data/db')
-
 const cors = require('cors')
-
+const db = require('./data/db');
+const express = require('express');
 const server = express();
 
-server.use(express.json(), cors())
-const PORT = 4040;
+server.use(express.json(), cors());
 
 
 
+// The above is an instance of an express application,
+// that we can use to configure our server.
 
-server.get('/api/users/', (req, res) => {
- db.find()
-   .then((users) => {
-    res
-     .json(users)
-   })
-   .catch(err => {
-    res
-     .status(500)
-     .json({error: "The users information could not be retrieved."})
-   })
+// server.get('/', (req, res) => {
+//   res.send('Hello world');
+// });
 
-})
+// server.get('/hobbits', (req, res) => {
+//   const hobbits =[{id: 1, name: "Samwise Gamgee"},
+//                   {id: 2, name:  "Frodo Baggins"}]
+//   res.status(200).json(hobbits);
+// });
+
+// server.get('/users', (req, res) => {
+//   const users = db.find();
+//   res.status(200).send(users);
+// })
+
+
+server.get('/api/users', (req, res) => {
+  db.find()
+    .then((users) => {
+      res.json(users);
+    })
+    .catch(err => {
+      res.status(500)
+         .json({error: err.message, error_message: "The users information is not available." })
+    })
+});
 
 server.get('/api/users/:id/', (req, res) => {
- // console.log("Request:", req.params.id)
- // console.log("Response:", res)
- const { id } = req.params;
- db.findById(id)
-   .then(user => {
-    if (user) {
-     res.json(user)
-    }
-    else {
-     res
-      .status(404)
-      .json({error: 'The user with the specified ID does not exist.'})
-    }
-   })
-   .catch(() => {
-    res
-     .status(500)
-     .json({error: "The user information could not be retrieved."})
-   })
+  const { id } = req.params;
+  db.findById(id)
+    .then(user => {
+      if (user) {
+        res.json(user);
+      }
+      else {
+        res.status(404)
+           .json({error: "This user is not in the database."})
+      }
+    })
+    .catch((err) => {
+      res.status(500)
+         .json({error_message: "The user information could not be retrieved"})
+    })
 })
+server.post('ap');
+server.put();
+server.delete();
 
 
-server.post('/api/users/', (req, res) => {
- const { name, bio } = req.body
- db.insert({name, bio})
-   .then((user) => {
-    if (name, bio) {
-     res
-      .status(201)
-      .json(user)
-      .send(response)
-    }
-    else {
-     res
-      .status(400)
-      .json({errorMessage: "Please provide name and bio for the user"})
-    }
-   })
-   .catch(() => {
-    res
-     .status(500)
-     .json({error: "There was an error while saving the user to the database."})
-   })
-})
+server.listen(8000, () => console.log('Server live on 8k.'));
 
-server.delete('/api/users/:id/', (req, res) => {
- const { id, user } = req.params
- db.remove(id)
-   .then(() => {
-    if (id){
-    res
-     .status(200)
-     .send({message: "User was removed from the database."})
-    }
-    else {
-    if (!id){
-    res
-     .status(404)
-     .json({message: "The user with the specified ID does not exist."})
-    }
-   }})
-   .catch(() => {
-    res
-     .status(500)
-     .json({error: "The user could not be removed."})
-  })
-})  
-
-
-
- 
-
-
-server.put('/api/users/:id', (req, res) => {
- console.log("Request for Id:", req.params.id)
- console.log("Request for body:", req.body)
- const user = req.body
- const { id } = req.params
- if (user.name && user.bio){
-  console.log("Success zero.")  
-  
-  db
-   .update(id, user)
-   .then(count => {
-    console.log("Success one.")
-    if (count){
-     db.findById(id)
-       .then(user => {
-        console.log("Success two.")
-        res
-         .json(user)
-       })
-    }
-    else {
-     res
-      .status(404)
-      .json({message: "The user with the specified ID does not exist."})
-    }
-   })
-   .catch(() => {
-    res
-     .status(500)
-     .json({error: "The user information could not be modified."})
-   })
- }
-})
-
-server.listen(PORT, () => {
- console.log(`Server running live on ${PORT}`)
-}); 
